@@ -30,7 +30,7 @@ int main()
 
   // ask for the homework grades
   cout << "Enter all your homework grades, "
-    "followed by end-of-file: ";
+          "followed by end-of-file: ";
   
   // the number and sum of grades read so far
   int count = 0;
@@ -44,7 +44,7 @@ int main()
   // sum is the sum of the first count grades
   while (cin >> x) {
     ++count;
-    hwgrades.push_back(x);
+    hwgrades.emplace_back(x);
   }
 
   vec_sz size = hwgrades.size();

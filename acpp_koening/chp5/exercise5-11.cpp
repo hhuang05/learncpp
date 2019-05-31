@@ -113,6 +113,11 @@ bool isPalindrome(const std::string& s)
   return true;
 }
 
+bool is_palindrome(const std::string& s)
+{
+  return std::equal(s.begin(), s.end(), s.rbegin());
+}
+
 void findPalindrome()
 {
   std::vector<std::string> words;
@@ -121,7 +126,7 @@ void findPalindrome()
   // Iterate over each word and check if it is a palindrome
   for (std::vector<std::string>::const_iterator it = words.begin();
        it != words.end(); ++it) {
-    if (isPalindrome(*it)) {
+    if (is_palindrome(*it)) {
       std::cout << "Length: " << it->size() << "   " << *it << std::endl;
     }
   }

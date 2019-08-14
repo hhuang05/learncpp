@@ -118,12 +118,15 @@ void Snake::moveLeft()
   } else if (m_headPosition.first == 1) {
     m_headPosition.first = Snake::border_width - 2;
   }
-  std::cerr << "Go Left\n";
 }
 
 void Snake::moveRight()
 {
-  std::cerr << "Go Right\n";
+  if (m_headPosition.first < (Snake::border_width-2)) {
+    m_headPosition.first++;
+  } else if (m_headPosition.first == (Snake::border_width-2)) {
+    m_headPosition.first = 1 ;
+  }
 }
 
 void Snake::moveUp()

@@ -63,6 +63,7 @@ char getCharImpl() {
 }
 
 void clearImpl() {
+  std::cout << std::flush;
   std::system("clear");
   //std::cout << "\033[2J";
 }

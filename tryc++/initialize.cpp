@@ -10,16 +10,19 @@ int main()
   
   int game_clock = 0;
   while (!snake_g.isGameOver()) {
-    if (game_clock > 3) {
-      std::cout << "Game Over!\n";
-      break;
-    }
+    
     snake_g.draw();
     snake_g.input();
     snake_g.logic();
-    std::cout << "Game clock " << game_clock << std::endl;
+    if (game_clock > 3) {
+      placeXY(0, Snake::border_height + 1);
+      std::cout << "Game Over! "
+		<< "Game clock " << game_clock << std::endl;
+      break;
+    }
+
     ++game_clock;
   }
-
+  
   return 0;
 }

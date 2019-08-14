@@ -1,9 +1,51 @@
 #include <iostream>
 #include <string>
+#include <memory>
 #include "Snake.hpp"
 #include "Utilities.hpp"
 
-void Snake::fruitSetUp()
+class SnakeImpl
+{
+private:
+  bool m_gameOver;
+  int m_score;
+  Snake::Direction m_direction;
+  std::pair<int, int> m_headPosition;
+  std::pair<int, int> m_fruitPosition;
+
+  Snake::Direction input();
+  void snakeSetUp();
+  void fruitSetUp();
+
+  void drawGameBoard();
+  void drawBorder();
+  void drawScore();
+
+public:
+  SnakeImpl(): 
+    m_gameOver(false), 
+    m_score(0),
+    m_direction(Snake::Direction::STOPPED),
+    m_headPosition(std::make_pair(0,0)),
+    m_fruitPosition(std::make_pair(0,0))
+  {
+    snakeSetUp();
+    fruitSetUp();
+  };
+
+  ~SnakeImpl() = default;
+  void draw();
+  void logic();
+  bool isGameOver() { return m_gameOver; }; 
+  bool hasCollidedWithTail();
+  bool hasEatenFruit();
+  void moveLeft();
+  void moveRight();
+  void moveUp();
+  void moveDown();
+};
+
+void SnakeImpl::fruitSetUp()
 {
   // Now get the coordinates
   // We limit the possible coordinates to be within the bounding box
@@ -16,14 +58,13 @@ void Snake::fruitSetUp()
   }
 }
 
-// Puts snake in the middle
-void Snake::snakeSetUp()
+void SnakeImpl::snakeSetUp()
 {
-  m_headPosition.first = border_width / 2;
-  m_headPosition.second = border_height / 2;
+  m_headPosition.first = Snake::border_width / 2;
+  m_headPosition.second = Snake::border_height / 2;
 }
 
-void Snake::drawGameBoard()
+void SnakeImpl::drawGameBoard()
 {
   // Draw fruit
   placeXY(m_fruitPosition.first, m_fruitPosition.second);
@@ -37,7 +78,7 @@ void Snake::drawGameBoard()
   placeXY(0, Snake::border_height + 1);
 }
 
-void Snake::drawBorder()
+void SnakeImpl::drawBorder()
 {
   std::string hor_line(Snake::border_width - 2, '*');
 
@@ -58,14 +99,13 @@ void Snake::drawBorder()
   std::cout << std::endl;
 }
 
-
-void Snake::drawScore()
+void SnakeImpl::drawScore()
 {
   placeXY(0, Snake::border_height+1);
   std::cout << "Current Score:" << m_score;
 }
 
-void Snake::draw()
+void SnakeImpl::draw()
 {
   clearScreen();
   drawBorder();
@@ -74,8 +114,7 @@ void Snake::draw()
   std::cout << std::flush;
 }
 
-
-Snake::Direction Snake::input()
+Snake::Direction SnakeImpl::input()
 {
   char input_ch = getChar();
 
@@ -94,7 +133,7 @@ Snake::Direction Snake::input()
   }
 }
 
-void Snake::logic()
+void SnakeImpl::logic()
 {
   Snake::Direction new_dir = input();
   switch (new_dir) 
@@ -130,7 +169,7 @@ void Snake::logic()
   }
 }
 
-void Snake::moveLeft()
+void SnakeImpl::moveLeft()
 {
   if (m_headPosition.first > 1) {
     m_headPosition.first--;
@@ -139,7 +178,7 @@ void Snake::moveLeft()
   }
 }
 
-void Snake::moveRight()
+void SnakeImpl::moveRight()
 {
   if (m_headPosition.first < (Snake::border_width-2)) {
     m_headPosition.first++;
@@ -149,7 +188,7 @@ void Snake::moveRight()
 }
 
 // Going up means Y coord is getting smaller
-void Snake::moveUp()
+void SnakeImpl::moveUp()
 {
   if (m_headPosition.second > 1) {
     m_headPosition.second--;
@@ -158,7 +197,7 @@ void Snake::moveUp()
   }
 }
 
-void Snake::moveDown()
+void SnakeImpl::moveDown()
 {
   if (m_headPosition.second < (Snake::border_height-2)) {
     m_headPosition.second++;
@@ -167,12 +206,12 @@ void Snake::moveDown()
   }
 }
 
-bool Snake::hasCollidedWithTail()
+bool SnakeImpl::hasCollidedWithTail()
 {
   return false;
 }
 
-bool Snake::hasEatenFruit()
+bool SnakeImpl::hasEatenFruit()
 {
   bool out = false;
 
@@ -182,4 +221,65 @@ bool Snake::hasEatenFruit()
   }
 
   return out;
+}
+
+// =========================================================
+// SNAKE CLASS METHODS
+// =========================================================
+
+Snake::Snake() : 
+  m_impl(std::make_unique<SnakeImpl>())
+{
+  std::cout << "Snake created!\n";
+}
+
+Snake::~Snake()
+{
+  std::cout << "Snake destroyed!\n";
+}
+
+void Snake::draw()
+{
+  m_impl->draw();
+}
+
+void Snake::logic()
+{
+  m_impl->logic();
+}
+
+bool Snake::isGameOver()
+{
+  return m_impl->isGameOver();
+}
+
+void Snake::moveLeft()
+{
+  m_impl->moveLeft();
+}
+
+void Snake::moveRight()
+{
+  m_impl->moveRight();
+}
+
+// Going up means Y coord is getting smaller
+void Snake::moveUp()
+{
+  m_impl->moveUp();
+}
+
+void Snake::moveDown()
+{
+  m_impl->moveDown();
+}
+
+bool Snake::hasCollidedWithTail()
+{
+  return m_impl->hasCollidedWithTail();
+}
+
+bool Snake::hasEatenFruit()
+{
+  return m_impl->hasEatenFruit();
 }

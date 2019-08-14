@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 
+// Forward declare
 class SnakeImpl;
 class Snake
 {

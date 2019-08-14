@@ -1,39 +1,45 @@
 #include <iostream>
-#include <string>
 #include <memory>
+#include <deque>
+#include <string>
+#include <utility>
 #include "Snake.hpp"
 #include "Utilities.hpp"
 
 class SnakeImpl
 {
 private:
+  typedef std::deque< std::pair<int, int> > tail_deque;
   bool m_gameOver;
   int m_score;
-  Snake::Direction m_direction;
-  std::pair<int, int> m_headPosition;
+  std::unique_ptr<tail_deque> m_tailPtr;
+
+  // Keep track of last pos of the tail
+  std::pair<int, int> m_lastTailPos;
   std::pair<int, int> m_fruitPosition;
 
   Snake::Direction input();
   void snakeSetUp();
   void fruitSetUp();
 
+  void growSnake(int x, int y);
   void drawGameBoard();
   void drawBorder();
   void drawScore();
+  void drawSnake();
 
 public:
   SnakeImpl(): 
     m_gameOver(false), 
     m_score(0),
-    m_direction(Snake::Direction::STOPPED),
-    m_headPosition(std::make_pair(0,0)),
+    m_tailPtr(std::make_unique<tail_deque>()),
     m_fruitPosition(std::make_pair(0,0))
   {
     snakeSetUp();
     fruitSetUp();
   };
 
-  ~SnakeImpl() = default;
+  ~SnakeImpl();
   void draw();
   void logic();
   bool isGameOver() { return m_gameOver; }; 
@@ -45,23 +51,48 @@ public:
   void moveDown();
 };
 
+SnakeImpl::~SnakeImpl()
+{
+}
+
+void SnakeImpl::growSnake(int x, int y)
+{
+  m_tailPtr->emplace_back(std::make_pair(x, y));
+}
+
 void SnakeImpl::fruitSetUp()
 {
   // Now get the coordinates
   // We limit the possible coordinates to be within the bounding box
   m_fruitPosition.first = randomNumber() % (Snake::border_width-2) + 1;
-  m_fruitPosition.second = randomNumber() % (Snake::border_height-2) + 1;
+  m_fruitPosition.second = Snake::border_height / 2;
 
-  if (m_fruitPosition.first == m_headPosition.first && 
-      m_fruitPosition.second == m_headPosition.second) {
+  // m_fruitPosition.first = randomNumber() % (Snake::border_width-2) + 1;
+  // m_fruitPosition.second = randomNumber() % (Snake::border_height-2) + 1;
+
+  if (m_fruitPosition.first == m_tailPtr->front().first && 
+      m_fruitPosition.second == m_tailPtr->front().second) {
     fruitSetUp();
   }
 }
 
 void SnakeImpl::snakeSetUp()
 {
-  m_headPosition.first = Snake::border_width / 2;
-  m_headPosition.second = Snake::border_height / 2;
+  growSnake(Snake::border_width / 2, Snake::border_height / 2);
+}
+
+void SnakeImpl::drawSnake()
+{
+  int c = 0;
+  for (auto &pair : *m_tailPtr) {
+    placeXY(pair.first, pair.second);
+    if (c == 0) {
+      std::cout << "O";
+    } else {
+      std::cout << "o";
+    }
+    ++c;
+  }
 }
 
 void SnakeImpl::drawGameBoard()
@@ -70,9 +101,7 @@ void SnakeImpl::drawGameBoard()
   placeXY(m_fruitPosition.first, m_fruitPosition.second);
   std::cout << "F";
 
-  // Draw snake head
-  placeXY(m_headPosition.first, m_headPosition.second);
-  std::cout << "O";
+  drawSnake();
 
   // After drawing fruit, set cursor to end of board
   placeXY(0, Snake::border_height + 1);
@@ -136,6 +165,12 @@ Snake::Direction SnakeImpl::input()
 void SnakeImpl::logic()
 {
   Snake::Direction new_dir = input();
+  // Track last position
+  auto tail = m_tailPtr->back();
+  
+  m_lastTailPos.first = tail.first;
+  m_lastTailPos.second = tail.second;
+
   switch (new_dir) 
   {
     case Snake::Direction::UP :
@@ -161,63 +196,84 @@ void SnakeImpl::logic()
   // Once we have moved to a new direction, we first check if we have
   // collided with tail. If not, check fruit
   if (hasCollidedWithTail()) {
-  }
-
-  if (hasEatenFruit()) {
+    m_gameOver = true;
+  } else if (hasEatenFruit()) {
     m_score++;
+    growSnake(m_lastTailPos.first, m_lastTailPos.second);
     fruitSetUp(); // Get new fruit
   }
 }
 
 void SnakeImpl::moveLeft()
 {
-  if (m_headPosition.first > 1) {
-    m_headPosition.first--;
-  } else if (m_headPosition.first == 1) {
-    m_headPosition.first = Snake::border_width - 2;
+  // Move everything left
+  for (auto &pair : *m_tailPtr)
+  {
+    if (pair.first > 1) {
+      pair.first--;
+    } else if (pair.first == 1) {
+      pair.first = Snake::border_width - 2;
+    }
   }
 }
 
 void SnakeImpl::moveRight()
 {
-  if (m_headPosition.first < (Snake::border_width-2)) {
-    m_headPosition.first++;
-  } else if (m_headPosition.first == (Snake::border_width-2)) {
-    m_headPosition.first = 1 ;
-  }
+//   m_tailLastPos.first = m_headPosition.first;
+
+//   if (m_headPosition.first < (Snake::border_width-2)) {
+//     m_headPosition.first++;
+//   } else if (m_headPosition.first == (Snake::border_width-2)) {
+//     m_headPosition.first = 1 ;
+//   }
 }
 
 // Going up means Y coord is getting smaller
 void SnakeImpl::moveUp()
 {
-  if (m_headPosition.second > 1) {
-    m_headPosition.second--;
-  } else if (m_headPosition.second == 1) {
-    m_headPosition.second = Snake::border_height - 2;
-  }
+//   m_tailLastPos.second = m_headPosition.second;
+
+//   if (m_headPosition.second > 1) {
+//     m_headPosition.second--;
+//   } else if (m_headPosition.second == 1) {
+//     m_headPosition.second = Snake::border_height - 2;
+//   }
 }
 
 void SnakeImpl::moveDown()
 {
-  if (m_headPosition.second < (Snake::border_height-2)) {
-    m_headPosition.second++;
-  } else if (m_headPosition.second == (Snake::border_height-2)) {
-    m_headPosition.second = 1 ;
-  }
+//   m_tailLastPos.second = m_headPosition.second;
+
+//   if (m_headPosition.second < (Snake::border_height-2)) {
+//     m_headPosition.second++;
+//   } else if (m_headPosition.second == (Snake::border_height-2)) {
+//     m_headPosition.second = 1 ;
+//   }
 }
 
 bool SnakeImpl::hasCollidedWithTail()
 {
+  auto head = m_tailPtr->front();
+  for (auto &pair : *m_tailPtr) {
+    if (head == pair) {
+      continue;
+    } else if (pair.first == head.first && 
+	       pair.second == head.second) {
+      return true;
+    }
+  }
+
   return false;
 }
 
 bool SnakeImpl::hasEatenFruit()
 {
   bool out = false;
-
-  if (m_headPosition.first == m_fruitPosition.first &&
-      m_headPosition.second == m_fruitPosition.second) {
+  auto head = m_tailPtr->front();
+  if (head.first == m_fruitPosition.first &&
+      head.second == m_fruitPosition.second) {
     out = true;
+
   }
 
   return out;
@@ -233,7 +289,9 @@ Snake::Snake() :
   std::cout << "Snake created!\n";
 }
 
-Snake::~Snake() = default;
+Snake::~Snake()
+{
+}
 
 void Snake::draw()
 {

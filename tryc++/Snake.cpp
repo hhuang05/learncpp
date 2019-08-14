@@ -129,12 +129,21 @@ void Snake::moveRight()
   }
 }
 
+// Going up means Y coord is getting smaller
 void Snake::moveUp()
 {
-  std::cerr << "Go Up\n";
+  if (m_headPosition.second > 1) {
+    m_headPosition.second--;
+  } else if (m_headPosition.second == 1) {
+    m_headPosition.second = Snake::border_height - 2;
+  }
 }
 
 void Snake::moveDown()
 {
-  std::cerr << "Go Down\n";
+  if (m_headPosition.second < (Snake::border_height-2)) {
+    m_headPosition.second++;
+  } else if (m_headPosition.second == (Snake::border_height-2)) {
+    m_headPosition.second = 1 ;
+  }
 }

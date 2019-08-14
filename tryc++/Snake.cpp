@@ -83,6 +83,7 @@ void SnakeImpl::snakeSetUp()
 
 void SnakeImpl::drawSnake()
 {
+  // Need to draw this in reverse
   int c = 0;
   for (auto &pair : *m_tailPtr) {
     placeXY(pair.first, pair.second);
@@ -219,13 +220,14 @@ void SnakeImpl::moveLeft()
 
 void SnakeImpl::moveRight()
 {
-//   m_tailLastPos.first = m_headPosition.first;
-
-//   if (m_headPosition.first < (Snake::border_width-2)) {
-//     m_headPosition.first++;
-//   } else if (m_headPosition.first == (Snake::border_width-2)) {
-//     m_headPosition.first = 1 ;
-//   }
+  for (auto &pair : *m_tailPtr)
+  {
+    if (pair.first < (Snake::border_width-2)) {
+      pair.first++;
+    } else if (pair.first == (Snake::border_width-2)) {
+      pair.first = 1 ;
+    }
+  }
 }
 
 // Going up means Y coord is getting smaller

@@ -14,6 +14,7 @@ private:
   std::pair<int, int> m_headPosition;
   std::pair<int, int> m_fruitPosition;
 
+  void drawGameBoard();
   void drawBorder();
 
 public:

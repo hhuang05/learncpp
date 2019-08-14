@@ -5,13 +5,15 @@
 
 void Snake::fruitSetUp()
 {
-  // Update rand seed
-  randomNumberSeed();
-  
   // Now get the coordinates
   // We limit the possible coordinates to be within the bounding box
   m_fruitPosition.first = randomNumber() % (Snake::border_width-2) + 1;
   m_fruitPosition.second = randomNumber() % (Snake::border_height-2) + 1;
+
+  if (m_fruitPosition.first == m_headPosition.first && 
+      m_fruitPosition.second == m_headPosition.second) {
+    fruitSetUp();
+  }
 }
 
 // Puts snake in the middle
@@ -30,6 +32,9 @@ void Snake::drawGameBoard()
   // Draw fruit
   placeXY(m_fruitPosition.first, m_fruitPosition.second);
   std::cout << "F";
+
+  // After drawing fruit, set cursor to end of board
+  placeXY(0, Snake::border_height + 1);
 }
 
 void Snake::drawBorder()
@@ -62,6 +67,8 @@ void Snake::draw()
 
 void Snake::input()
 {
+  char input_ch = getChar();
+  std::cout << "Key pressed: " << input_ch << "\n";
 }
 
 void Snake::logic()

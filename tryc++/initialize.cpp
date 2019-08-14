@@ -6,16 +6,12 @@ int main()
   // Update rand seed
   randomNumberSeed();
   
-  Snake snake_g;
-
-  snake_g.snakeSetUp();
-  snake_g.fruitSetUp();
-  
+  Snake snake_g;  
   int game_clock = 0;
-  if (!snake_g.isGameOver()) {
+
+  while (!snake_g.isGameOver()) {
     
     snake_g.draw();
-    snake_g.input();
     snake_g.logic();
     if (game_clock > 3) {
       placeXY(0, Snake::border_height + 4);

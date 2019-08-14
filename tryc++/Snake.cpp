@@ -63,30 +63,75 @@ void Snake::draw()
   clearScreen();
   drawBorder();
   drawGameBoard();
+  std::cout << std::flush;
 }
 
-void Snake::input()
+Snake::Direction Snake::input()
 {
   char input_ch = getChar();
-  std::cout << "Key pressed: " << input_ch << "\n";
+
+  switch (input_ch) 
+  {
+    case 'w':
+      return Snake::Direction::UP;
+    case 'a':
+      return Snake::Direction::LEFT;
+    case 's':
+      return Snake::Direction::DOWN;
+    case 'd':
+      return Snake::Direction::RIGHT;
+    default:
+      return Snake::Direction::STOPPED;
+  }
 }
 
 void Snake::logic()
 {
+  Snake::Direction new_dir = input();
+  switch (new_dir) 
+  {
+    case Snake::Direction::UP :
+      moveUp();
+      break;
+
+    case Snake::Direction::LEFT :
+      moveLeft();
+      break;
+
+    case Snake::Direction::DOWN :
+      moveDown();
+      break;
+
+    case Snake::Direction::RIGHT :
+      moveRight();
+      break;
+
+    default:
+      break;
+  }
 }
 
 void Snake::moveLeft()
 {
+  if (m_headPosition.first > 1) {
+    m_headPosition.first--;
+  } else if (m_headPosition.first == 1) {
+    m_headPosition.first = Snake::border_width - 2;
+  }
+  std::cerr << "Go Left\n";
 }
 
 void Snake::moveRight()
 {
+  std::cerr << "Go Right\n";
 }
 
 void Snake::moveUp()
 {
+  std::cerr << "Go Up\n";
 }
 
 void Snake::moveDown()
 {
+  std::cerr << "Go Down\n";
 }

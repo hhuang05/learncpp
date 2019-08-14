@@ -25,13 +25,13 @@ void Snake::snakeSetUp()
 
 void Snake::drawGameBoard()
 {
-  // Draw snake head
-  placeXY(m_headPosition.first, m_headPosition.second);
-  std::cout << "O";
-
   // Draw fruit
   placeXY(m_fruitPosition.first, m_fruitPosition.second);
   std::cout << "F";
+
+  // Draw snake head
+  placeXY(m_headPosition.first, m_headPosition.second);
+  std::cout << "O";
 
   // After drawing fruit, set cursor to end of board
   placeXY(0, Snake::border_height + 1);
@@ -58,13 +58,22 @@ void Snake::drawBorder()
   std::cout << std::endl;
 }
 
+
+void Snake::drawScore()
+{
+  placeXY(0, Snake::border_height+1);
+  std::cout << "Current Score:" << m_score;
+}
+
 void Snake::draw()
 {
   clearScreen();
   drawBorder();
   drawGameBoard();
+  drawScore();
   std::cout << std::flush;
 }
+
 
 Snake::Direction Snake::input()
 {
@@ -109,6 +118,16 @@ void Snake::logic()
     default:
       break;
   }
+
+  // Once we have moved to a new direction, we first check if we have
+  // collided with tail. If not, check fruit
+  if (hasCollidedWithTail()) {
+  }
+
+  if (hasEatenFruit()) {
+    m_score++;
+    fruitSetUp(); // Get new fruit
+  }
 }
 
 void Snake::moveLeft()
@@ -146,4 +165,21 @@ void Snake::moveDown()
   } else if (m_headPosition.second == (Snake::border_height-2)) {
     m_headPosition.second = 1 ;
   }
+}
+
+bool Snake::hasCollidedWithTail()
+{
+  return false;
+}
+
+bool Snake::hasEatenFruit()
+{
+  bool out = false;
+
+  if (m_headPosition.first == m_fruitPosition.first &&
+      m_headPosition.second == m_fruitPosition.second) {
+    out = true;
+  }
+
+  return out;
 }

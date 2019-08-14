@@ -25,10 +25,21 @@ private:
   std::pair<int, int> m_headPosition;
   std::pair<int, int> m_fruitPosition;
 
+  Snake::Direction input();
   void snakeSetUp();
   void fruitSetUp();
+
   void drawGameBoard();
   void drawBorder();
+  void drawScore();
+
+  void moveLeft();
+  void moveRight();
+  void moveUp();
+  void moveDown();
+
+  bool hasCollidedWithTail();
+  bool hasEatenFruit();
 
 public:
   static const int border_width = 15;
@@ -52,14 +63,8 @@ public:
   };
 
   void draw();
-  Snake::Direction input();
   void logic();
   bool isGameOver() { return m_gameOver; }; 
-  void moveLeft();
-  void moveRight();
-  void moveUp();
-  void moveDown();
-
 
 };
 

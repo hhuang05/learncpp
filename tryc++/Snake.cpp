@@ -233,10 +233,7 @@ Snake::Snake() :
   std::cout << "Snake created!\n";
 }
 
-Snake::~Snake()
-{
-  std::cout << "Snake destroyed!\n";
-}
+Snake::~Snake() = default;
 
 void Snake::draw()
 {
